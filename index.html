@@ -509,14 +509,14 @@
                     <img id="preview" alt="Preview">
                     <!-- Sticker will be added here dynamically -->
                 </div>
-                <div class="drag-hint" id="dragHint">👆 Geser logo ke posisi yang diinginkan</div>
+                <div class="drag-hint" id="dragHint">👆 Geser sticker ke posisi yang diinginkan</div>
                 <div class="controls">
                     <div class="btn-group">
                         <button class="btn btn-secondary" onclick="retakePhoto()">
                             🔄 Ulang
                         </button>
                         <button class="btn btn-badge" onclick="openBadgeModal()">
-                            🏷️ LOGO BASIS
+                            🏷️ Badge
                         </button>
                         <button class="btn btn-success" onclick="savePhoto()">
                             💾 Simpan
@@ -531,14 +531,14 @@
     <div class="modal-overlay" id="badgeModal">
         <div class="modal">
             <div class="modal-header">
-                <span class="modal-title">🏷️ Pilih LOGO BASIS</span>
+                <span class="modal-title">🏷️ Pilih Badge Basis</span>
                 <button class="modal-close" onclick="closeBadgeModal()">✕</button>
             </div>
             <div class="badge-grid" id="badgeGrid">
                 <!-- Badges will be populated by JavaScript -->
             </div>
             <button class="skip-badge" onclick="removeBadgeAndClose()">
-                ❌ Tanpa LOGO
+                ❌ Tanpa Badge
             </button>
         </div>
     </div>
@@ -871,22 +871,27 @@
                 const badgeImg = badgeImages[selectedBadge.id];
                 
                 if (badgeImg.complete) {
-                    // Calculate sticker position relative to canvas
+                    // Get preview image actual rendered size and position
                     const previewRect = preview.getBoundingClientRect();
                     const stickerRect = stickerElement.getBoundingClientRect();
                     
-                    // Calculate scale factor between preview and actual canvas
+                    // Calculate scale factor between preview display and actual canvas
                     const scaleX = canvas.width / previewRect.width;
                     const scaleY = canvas.height / previewRect.height;
                     
-                    // Calculate position on canvas
+                    // Calculate sticker position on canvas (relative to preview image)
                     const stickerLeft = (stickerRect.left - previewRect.left) * scaleX;
                     const stickerTop = (stickerRect.top - previewRect.top) * scaleY;
                     
-                    // Sticker size (250x250 original, scaled to canvas)
-                    const stickerSize = 250 * Math.min(scaleX, scaleY) * 0.5;
+                    // Sticker size - use the ACTUAL displayed sticker size scaled to canvas
+                    // stickerElement size in CSS is 80px (or 60px on mobile)
+                    const stickerDisplayWidth = stickerElement.offsetWidth;
+                    const stickerDisplayHeight = stickerElement.offsetHeight;
                     
-                    finalCtx.drawImage(badgeImg, stickerLeft, stickerTop, stickerSize, stickerSize);
+                    const stickerCanvasWidth = stickerDisplayWidth * scaleX;
+                    const stickerCanvasHeight = stickerDisplayHeight * scaleY;
+                    
+                    finalCtx.drawImage(badgeImg, stickerLeft, stickerTop, stickerCanvasWidth, stickerCanvasHeight);
                 }
             }
             
